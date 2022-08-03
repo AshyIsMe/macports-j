@@ -5,6 +5,7 @@ PortGroup               github 1.0
 
 #github.setup            jsoftware jsource 904-beta-c
 github.setup            jsoftware jsource d69825ebb2b5c4eba9b38c00497cd884f4d0058d
+version                 9.04
 checksums               sha1 ecf427b1d1c486f9801f8f32344021cec10ac771
 
 
@@ -32,9 +33,25 @@ depends_lib \
 
 use_configure       no
 
-#build {
-     #cd jsource/make2         \
-      #&& ./build_jconsole.sh  \
-      #&& ./build_libj.sh
-#}
 build.cmd       ./make2/build_all.sh && ./make2/cpbin.sh
+
+destroot {
+    # AA TODO: Install all the j addons first (into ${worksrcpath}/jlibrary/addons)
+    # How do I run this with tcl?
+    #echo "exit '' ] install '*'" | ${worksrcpath}/jlibrary/bin/jconsole
+
+    xinstall ${worksrcpath}/jlibrary/bin/jconsole-mac  ${destroot}${prefix}/bin/ijconsole
+    #xinstall ${worksrcpath}/jlibrary/bin/libj.dylib  ${destroot}${prefix}/lib/libj.dylib
+    # AA TODO: get libj.dylib to work from .../lib properly
+    xinstall ${worksrcpath}/jlibrary/bin/libj.dylib  ${destroot}${prefix}/bin/libj.dylib
+
+    xinstall -d ${destroot}${prefix}/etc/${name}/${version}
+    # AA TODO: profile.ijs might need to be patched for macports paths
+    xinstall ${worksrcpath}/jlibrary/bin/profile.ijs  ${destroot}${prefix}/etc/${name}/${version}/profile.ijs
+
+    set jpath ${destroot}${prefix}/share/${name}/${version}
+    xinstall -d ${jpath}
+    move ${worksrcpath}/jlibrary/addons ${jpath}
+    move ${worksrcpath}/jlibrary/system ${jpath}
+    move ${worksrcpath}/jlibrary/tools ${jpath}
+}
